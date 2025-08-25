@@ -4,7 +4,7 @@ on:
   pull_request: 
     branches: [agents]
   push: 
-    branches: [agents]
+    branches: [agents, "workflow-update"]
   workflow_dispatch:
 
 jobs:
@@ -20,9 +20,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          repository: greninja517/aifaq
-          ref: workflow_update
 
       - name: Setup Python
         uses: actions/setup-python@v5
