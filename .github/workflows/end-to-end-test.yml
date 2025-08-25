@@ -12,10 +12,11 @@ jobs:
     name: "E2E Streamlit Test"
     runs-on: ubuntu-latest
 
+    # the following secrets to be created at repository level by the maintainer
     env:
       MISTRALAI_API_KEY: ${{ secrets.MISTRALAI_API_KEY || 'ocw3CHFSbuJ052fqzG8bTfKx0c29UTAO' }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'openai_demo_key' }}
-      HF_TOKEN: ${{ secrets.HF_TOKEN || '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' }}
+      HF_TOKEN: ${{ secrets.HF_TOKEN || 'hugging_face_demo_key' }}
 
     steps:
       - name: Checkout Repository
@@ -30,7 +31,7 @@ jobs:
         working-directory: src/mvt
         run: |
           python -m pip install --upgrade pip
-          pip install -r ci_requirement.txt
+          pip install -r ci_requirements.txt
           sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
           sudo chmod +x /usr/bin/yq
       
@@ -41,20 +42,22 @@ jobs:
 
       - name: Setup files and configuration
         working-directory: src/mvt
+        env:
+          Mistral_Model_Name: "codestral-2508"
         run: |
           cp query_rewriting_prompt.txt.example query_rewriting_prompt.txt
           cp system_prompt.txt.example system_prompt.txt
           cp config.yaml.example config.yaml
 
           if [[ -f config.yaml ]]; then
-            yq e -i '.model_name="codestral-2508"' config.yaml
+            yq e -i ".model_name=strenv(Mistral_Model_Name)" config.yaml
           fi
 
       - name: Run Streamlit
         working-directory: src/mvt
         run: |
           streamlit run app.py dev &
-          sleep 100
+          sleep 10
 
       - name: Test Streamlit App
         working-directory: .github/scripts
