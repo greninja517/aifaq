@@ -67,6 +67,13 @@ jobs:
         if: steps.check_core_dir.outputs.core_dir_exists == 'true'
         run: |
           black src/core
+
+      - name: Format MVT
+        run: |
+          if [ -d "src/mvt" ]; then
+            echo "Formatting MVT directory"
+            black src/mvt
+          fi
           
       - name: Post Formatting Check
         run: git diff --exit-code
