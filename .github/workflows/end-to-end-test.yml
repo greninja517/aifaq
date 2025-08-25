@@ -54,7 +54,7 @@ jobs:
         working-directory: src/mvt
         run: |
           streamlit run app.py dev &
-          sleep 10
+          sleep 100
 
       - name: Test Streamlit App
         working-directory: .github/scripts
