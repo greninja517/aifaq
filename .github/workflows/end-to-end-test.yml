@@ -21,7 +21,7 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          ref: agents
+          ref: workflow-update
 
       - name: Setup Python
         uses: actions/setup-python@v5
