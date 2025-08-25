@@ -21,7 +21,8 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
-          ref: agents
+          repository: https://github.com/greninja517/aifaq
+          ref: workflow_update
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -32,7 +33,7 @@ jobs:
         working-directory: src/mvt
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r ci_requirements.txt
           sudo wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/bin/yq
           sudo chmod +x /usr/bin/yq
       
