@@ -1,0 +1,60 @@
+name: End-to-End Test
+
+on:
+  pull_request: 
+    branches: [agents]
+  push: 
+    branches: [agents]
+  workflow_dispatch:
+
+jobs:
+  e2e-test:
+    name: "E2E Streamlit Test"
+    runs-on: ubuntu-latest
+
+    env:
+      MISTRALAI_API_KEY: ${{ secrets.MISTRALAI_API_KEY || 'ocw3CHFSbuJ052fqzG8bTfKx0c29UTAO' }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY || 'openai_demo_key' }}
+      HF_TOKEN: ${{ secrets.HF_TOKEN || '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' }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+      
+      - name: Install Dependencies and tools
+        working-directory: src/mvt
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r ci_requirements.txt
+          sudo apt -y update && sudo apt install -y yq
+      
+      - name: Create Required Directories
+        working-directory: src/mvt
+        run: |
+          python create_directories.py
+
+      - name: Setup files and configuration
+        working-directory: src/mvt
+        run: |
+          cp query_rewriting_prompt.txt.example query_rewriting_prompt.txt
+          cp system_prompt.txt.example system_prompt.txt
+          cp config.yaml.example config.yaml
+
+          if [[ -f config.yaml ]]; then
+            yq e -i '.model_name="codestral-2508"' config.yaml
+          fi
+
+      - name: Run Streamlit
+        working-directory: src/mvt
+        run: |
+          streamlit run app.py dev &
+
+      - name: Test Streamlit App
+        working-directory: .github/scripts
+        run: |
+          python test-streamlit.py
